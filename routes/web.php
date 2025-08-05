@@ -8,10 +8,11 @@ use App\Http\Controllers\Admin\TicketController as AdminTicketController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\CategoryController; 
+use App\Http\Controllers\Admin\ReportController;
 
 // Rute Halaman Awal
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 // Rute Dashboard 
@@ -44,7 +45,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Resource Route untuk Manajemen User
     Route::resource('users', UserController::class);
     // Resource Route untuk Manajemen Kategori
-    Route::resource('categories', CategoryController::class); 
+    Route::resource('categories', CategoryController::class);
+    
+    Route::post('/tickets/{ticket}/assign', [AdminTicketController::class, 'assignTicket'])->name('tickets.assign'); // <-- Tambahkan ini
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 });
 
 // File rute otentikasi dari Breeze

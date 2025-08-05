@@ -9,7 +9,7 @@
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <form method="POST" action="{{ route('tickets.store') }}">
+                    <form method="POST" action="{{ route('tickets.store') }}" enctype="multipart/form-data">
                         @csrf
 
                         <!-- Judul Tiket -->
@@ -38,6 +38,14 @@
                             <x-input-label for="description" :value="__('Deskripsikan Masalah Anda Secara Rinci')" />
                             <textarea id="description" name="description" rows="5" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" placeholder="Sebutkan detail error, langkah yang sudah dicoba, dll." required>{{ old('description') }}</textarea>
                             <x-input-error :messages="$errors->get('description')" class="mt-2" />
+                        </div>
+                        
+                        <!-- Lampiran File -->
+                        <div class="mt-4">
+                            <x-input-label for="attachment" :value="__('Lampiran (Opsional)')" />
+                            <input id="attachment" name="attachment" type="file" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none">
+                            <p class="mt-1 text-sm text-gray-500">Tipe file: JPG, PNG, PDF. Maksimal 2MB.</p>
+                            <x-input-error :messages="$errors->get('attachment')" class="mt-2" />
                         </div>
                         
                         <!-- Prioritas -->

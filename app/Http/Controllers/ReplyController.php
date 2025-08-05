@@ -2,66 +2,49 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\TicketReplied;
 use App\Models\Ticket;
-use App\Models\User; // <-- Tambahkan ini
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail; // <-- Tambahkan ini
+use Illuminate\Support\Facades\Mail;
+use App\Events\NewReplyNotification;
 
 class ReplyController extends Controller
 {
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request, Ticket $ticket)
     {
+        // 1. Validasi input balasan
         $request->validate(['body' => 'required|string']);
 
-        // 1. Simpan balasan ke database
+        // 2. Simpan balasan ke database
         $reply = $ticket->replies()->create([
             'user_id' => Auth::id(),
             'body' => $request->body,
         ]);
 
-        // =======================================================
-        // 2. LOGIKA PENGIRIMAN EMAIL
-        // =======================================================
+        // 3. Kirim notifikasi email menggunakan Mailable Class
         try {
             if ($reply->user->is_admin) {
-                // Skenario 1: Admin yang membalas, kirim email ke User
-                $recipient = $ticket->user;
-                $subject = "Re: Tiket #{$ticket->id} - {$ticket->title}";
-                $body = "Halo {$recipient->name},\n\n" .
-                        "Admin telah memberikan balasan baru untuk tiket Anda dengan judul \"{$ticket->title}\".\n\n" .
-                        "Isi Balasan:\n\"{$reply->body}\"\n\n" .
-                        "Silakan cek aplikasi untuk detail lebih lanjut.";
-                
-                Mail::raw($body, function ($message) use ($recipient, $subject) {
-                    $message->to($recipient->email)
-                            ->subject($subject);
-                });
-
+                // Jika admin yang membalas, kirim email ke user pemilik tiket
+                Mail::to($ticket->user->email)->send(new TicketReplied($ticket, $reply));
             } else {
-                // Skenario 2: User yang membalas, kirim email ke semua Admin
+                // Jika user yang membalas, kirim email ke semua admin
                 $admins = User::where('is_admin', true)->get();
-                $subject = "Balasan Baru Pengguna untuk Tiket #{$ticket->id}";
-                
                 foreach ($admins as $admin) {
-                    $body = "Halo {$admin->name},\n\n" .
-                            "Pengguna {$reply->user->name} telah memberikan balasan baru pada tiket #{$ticket->id} dengan judul \"{$ticket->title}\".\n\n" .
-                            "Isi Balasan:\n\"{$reply->body}\"\n\n" .
-                            "Mohon untuk segera ditindaklanjuti.";
-
-                    Mail::raw($body, function ($message) use ($admin, $subject) {
-                        $message->to($admin->email)
-                                ->subject($subject);
-                    });
+                    Mail::to($admin->email)->send(new TicketReplied($ticket, $reply));
                 }
             }
         } catch (\Exception $e) {
-            // Jika email gagal dikirim, proses tetap lanjut tapi bisa dicatat errornya
-            // (Untuk production, Anda bisa menggunakan Log::error($e->getMessage());)
+            // Tangani error jika email gagal dikirim.
+            // Untuk aplikasi produksi, Anda bisa mencatat error ini:
+            // \Log::error('Gagal mengirim email notifikasi balasan: ' . $e->getMessage());
         }
-        // =======================================================
 
-        // 3. Arahkan kembali ke halaman detail tiket
+        // 4. Arahkan kembali ke halaman detail tiket dengan pesan sukses
         return redirect()->route('tickets.show', $ticket)->with('success', 'Balasan Anda telah dikirim.');
     }
 }

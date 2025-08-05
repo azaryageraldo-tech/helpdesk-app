@@ -62,4 +62,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Reply::class);
     }
+
+    public function assignedTickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class, 'assigned_to');
+    }
 }

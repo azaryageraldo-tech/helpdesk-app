@@ -16,7 +16,9 @@ class Ticket extends Model
         'category_id', // <-- Tambahkan ini
         'title',
         'description',
+        'attachment',
         'status',
+        'assigned_to',
         'priority',
     ];
 
@@ -33,5 +35,10 @@ class Ticket extends Model
     public function replies(): HasMany
     {
         return $this->hasMany(Reply::class);
+    }
+
+    public function assignedTo(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
     }
 }

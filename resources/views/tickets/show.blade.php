@@ -16,15 +16,22 @@
                 
                 <div class="p-6 text-gray-900 grid grid-cols-1 md:grid-cols-3 gap-6">
 
-                    <!-- Kolom Kiri: Detail Masalah -->
                     <div class="md:col-span-2">
                         <h3 class="text-lg font-bold border-b pb-2 mb-4">Deskripsi Masalah</h3>
                         <div class="prose max-w-none text-gray-800">
                             {!! nl2br(e($ticket->description)) !!}
                         </div>
+
+                        @if($ticket->attachment)
+                            <div class="mt-6">
+                                <h4 class="font-bold mb-2">Lampiran:</h4>
+                                <a href="{{ Storage::url($ticket->attachment) }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700">
+                                    Lihat Lampiran
+                                </a>
+                            </div>
+                        @endif
                     </div>
 
-                    <!-- Kolom Kanan: Info & Aksi Tiket -->
                     <div class="md:col-span-1 space-y-4">
                         <div class="bg-gray-50 p-4 rounded-lg border">
                             <h3 class="text-lg font-bold border-b pb-2 mb-4">Informasi Tiket</h3>
@@ -45,6 +52,11 @@
                                         @if($ticket->status == 'In Progress') bg-orange-100 text-orange-800 @endif
                                         @if($ticket->status == 'Closed') bg-gray-200 text-gray-800 @endif
                                     ">{{ $ticket->status }}</span>
+                                </p>
+                                <p><strong>Ditugaskan Kepada:</strong> 
+                                    <span class="font-semibold">
+                                        {{ $ticket->assignedTo->name ?? 'Belum Ditugaskan' }}
+                                    </span>
                                 </p>
                             </div>
                         </div>
@@ -67,9 +79,29 @@
                                 </div>
                             </form>
                         </div>
+                        
+                        <div class="bg-gray-50 p-4 rounded-lg border">
+                            <h3 class="text-lg font-bold border-b pb-2 mb-4">Tugaskan Tiket</h3>
+                            <form action="{{ route('admin.tickets.assign', $ticket->id) }}" method="POST">
+                                @csrf
+                                <div>
+                                    <label for="admin_id" class="block font-medium text-sm text-gray-700">Pilih Admin</label>
+                                    <select name="admin_id" id="admin_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+                                        <option value="">-- Pilih Admin --</option>
+                                        @foreach($admins as $admin)
+                                            <option value="{{ $admin->id }}" @if($ticket->assigned_to == $admin->id) selected @endif>
+                                                {{ $admin->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="mt-4">
+                                    <x-primary-button>Tugaskan</x-primary-button>
+                                </div>
+                            </form>
+                        </div>
                         @endif
                     </div>
-
                 </div>
                 
                 <div class="border-t mx-6 my-6"></div>

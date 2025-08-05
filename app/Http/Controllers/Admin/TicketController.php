@@ -20,4 +20,21 @@ class TicketController extends Controller
 
         return redirect()->route('tickets.show', $ticket)->with('success', 'Status tiket berhasil diperbarui.');
     }
+
+    /**
+     * Menugaskan tiket ke seorang admin.
+     */
+    public function assignTicket(Request $request, Ticket $ticket)
+    {
+        $request->validate([
+            // Pastikan user yang dipilih ada dan merupakan seorang admin
+            'admin_id' => 'required|exists:users,id',
+        ]);
+
+        $ticket->update([
+            'assigned_to' => $request->admin_id,
+        ]);
+
+        return redirect()->route('tickets.show', $ticket)->with('success', 'Tiket berhasil ditugaskan.');
+    }
 }

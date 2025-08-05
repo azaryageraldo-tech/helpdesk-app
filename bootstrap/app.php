@@ -11,11 +11,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Daftarkan alias untuk middleware di sini
         $middleware->alias([
             'admin' => \App\Http\Middleware\IsAdmin::class,
         ]);
     })
+    // TAMBAHKAN BAGIAN INI JIKA BELUM ADA
+    ->withBroadcasting(
+        __DIR__.'/../routes/channels.php', // <-- HAPUS TANDA KOMENTAR DI SINI
+        ['prefix' => 'api', 'middleware' => ['api', 'auth:sanctum']],
+    )
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
