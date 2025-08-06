@@ -7,18 +7,18 @@ use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\Admin\TicketController as AdminTicketController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\Admin\CategoryController; 
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ReportController;
 
-// Rute Halaman Awal
+// Alihkan halaman utama ke halaman login
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// Rute Dashboard 
+// Rute Dashboard
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])->name('dashboard');
-
 
 // Grup Rute yang memerlukan Login
 Route::middleware('auth')->group(function () {
@@ -35,19 +35,23 @@ Route::middleware('auth')->group(function () {
     
     // Rute untuk menyimpan balasan
     Route::post('/tickets/{ticket}/replies', [ReplyController::class, 'store'])->name('replies.store');
+
+    // Rute untuk Notifikasi
+    Route::get('/notifications', [NotificationController::class, 'fetch'])->name('notifications.fetch');
+    Route::post('/notifications/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 });
 
 // Grup Route KHUSUS untuk Admin
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    // Rute untuk mengubah status tiket
+    // Rute Aksi Tiket
     Route::post('/tickets/{ticket}/status', [AdminTicketController::class, 'updateStatus'])->name('tickets.updateStatus');
+    Route::post('/tickets/{ticket}/assign', [AdminTicketController::class, 'assignTicket'])->name('tickets.assign');
 
-    // Resource Route untuk Manajemen User
+    // Resource Route untuk Manajemen
     Route::resource('users', UserController::class);
-    // Resource Route untuk Manajemen Kategori
     Route::resource('categories', CategoryController::class);
-    
-    Route::post('/tickets/{ticket}/assign', [AdminTicketController::class, 'assignTicket'])->name('tickets.assign'); // <-- Tambahkan ini
+
+    // Rute Laporan
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 });
 

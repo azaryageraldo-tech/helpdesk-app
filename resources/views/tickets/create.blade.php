@@ -7,8 +7,11 @@
 
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
+            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+                <div class="p-6 sm:px-8 bg-white border-b border-gray-200">
+
+                    <h3 class="text-xl font-semibold text-gray-700 mb-6">Formulir Tiket Baru</h3>
+
                     <form method="POST" action="{{ route('tickets.store') }}" enctype="multipart/form-data">
                         @csrf
 
@@ -59,7 +62,7 @@
                              <x-input-error :messages="$errors->get('priority')" class="mt-2" />
                         </div>
 
-                        <div class="flex items-center justify-end mt-6">
+                        <div class="flex items-center justify-end mt-6 pt-6 border-t">
                             <a href="{{ route('tickets.index') }}" class="text-sm text-gray-600 hover:text-gray-900 underline mr-4">
                                 Batal
                             </a>

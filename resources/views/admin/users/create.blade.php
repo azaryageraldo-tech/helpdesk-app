@@ -7,9 +7,11 @@
 
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
+            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+                <div class="p-6 sm:px-8 bg-white border-b border-gray-200">
                     
+                    <h3 class="text-xl font-semibold text-gray-700 mb-6">Formulir Pengguna Baru</h3>
+
                     {{-- Menampilkan error validasi jika ada --}}
                     @if ($errors->any())
                         <div class="mb-4 p-4 bg-red-100 text-red-700 border border-red-400 rounded">
@@ -25,26 +27,31 @@
                     <form method="POST" action="{{ route('admin.users.store') }}">
                         @csrf
 
+                        <!-- Nama -->
                         <div>
                             <x-input-label for="name" :value="__('Nama')" />
                             <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus />
                         </div>
 
+                        <!-- Email -->
                         <div class="mt-4">
                             <x-input-label for="email" :value="__('Email')" />
                             <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required />
                         </div>
 
+                        <!-- Password -->
                         <div class="mt-4">
                             <x-input-label for="password" :value="__('Password')" />
                             <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
                         </div>
 
+                        <!-- Konfirmasi Password -->
                         <div class="mt-4">
                             <x-input-label for="password_confirmation" :value="__('Konfirmasi Password')" />
                             <x-text-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required />
                         </div>
 
+                        <!-- Peran / Role -->
                         <div class="mt-4">
                             <x-input-label for="is_admin" :value="__('Peran (Role)')" />
                             <select name="is_admin" id="is_admin" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
@@ -53,7 +60,7 @@
                             </select>
                         </div>
 
-                        <div class="flex items-center justify-end mt-6">
+                        <div class="flex items-center justify-end mt-6 pt-6 border-t">
                             <a href="{{ route('admin.users.index') }}" class="text-sm text-gray-600 hover:text-gray-900 underline mr-4">
                                 Batal
                             </a>
